@@ -44,7 +44,7 @@ options mprint;
 %mend;
 
 /* アキネイタークイズの実行マクロ */
-%macro akinator(text,history_ds,api_key,past_num=3,model=gpt-4-turbo-preview);
+%macro akinator(text,history_ds,api_key,past_num=0,model=gpt-4-turbo-preview);
     /* ユーザー入力の履歴データセットへの追加 */
     data &history_ds.;
         length user $1000 assistant $1000;
@@ -68,7 +68,7 @@ options mprint;
         set &history_ds. nobs=nobs;
         /* システム、ユーザー、アシスタントメッセージを組み立て */
         if _n_=1 then a = cats('{"model": "',"&model.",'","messages": [{"role":"system","content":"',&system_prompt.,'"},');
-        if nobs - &past_num.<_n_ < nobs then a = cats(a, '{"role": "user", "content":"',user,'"},{"role":"assistant","content":"',assistant,'"},');
+        if nobs - &past_num.=<_n_ < nobs then a = cats(a, '{"role": "user", "content":"',user,'"},{"role":"assistant","content":"',assistant,'"},');
         if _n_ = nobs then do;
             a = cats(a, '{"role": "user", "content":"',user,'"}]}');	
             put a;
